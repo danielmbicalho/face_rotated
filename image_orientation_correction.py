@@ -84,3 +84,26 @@ pred_decoded = list(pred_decoded)
 pred_df = pd.DataFrame({'fn': names, 'label': pred_decoded})
 
 pred_df.to_csv('test.preds.csv')
+
+def correct_image(image, rotation):
+    
+    cols, rows, channels = image.shape
+    angle = 0
+    
+    if rotation == 'rotated_left':
+        angle = -90
+    elif rotation == 'rotated_right':
+        angle = 90
+    
+    elif rotation == 'upside_down':
+        angle = 180
+    
+    M = cv2.getRotationMatrix2D((cols/2,rows/2),angle,1)
+    img_result = cv2.warpAffine(image,M,(cols,rows))
+        
+    return img_result
+
+for i, img in enumerate(test_images):
+    corrected_image = correct_image(img, pred_df.iloc[i]['label'])
+    cv2.imwrite('results' + pred_df.iloc[i]['fn'] + '_corrected', corrected_image)
+    
